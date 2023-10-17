@@ -1,83 +1,70 @@
 import React, { useState } from 'react';
-import { SERVER_URL } from '../constants';
-import { Link } from 'react-router-dom';
+import {SERVER_URL} from '../constants'
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 
-function AddAssignment(props) {
-  const [assignmentName, setAssignmentName] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [courseId, setCourseId] = useState('');
+
+function AddAssignment(props) { 
+
+  const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
-
-  const handleSubmit = () => {
+  const [assignment, setAssignment] = useState({ assignmentName:'', dueDate:'', courseId: '' });
+  
+  const handleOpen = () => {
     setMessage('');
-
-    const assignmentData = {
-      assignmentName: assignmentName,
-      dueDate: dueDate,
-      courseId: courseId,
-    };
-
-    fetch(`${SERVER_URL}/assignment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(assignmentData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          
-          setMessage('Assignment created successfully.');
-        } else {
-         
-          setMessage('Failed to create assignment.');
-          console.error('Failed to create assignment.');
-        }
-      })
-      .catch((error) => {
-        setMessage('Error: ' + error);
-        console.error('Error:', error);
-      });
+    setAssignment({ assignmentName:'', dueDate:'', courseId: '' });
+    setOpen(true);
   };
 
+  const handleClose = () => {
+    setOpen(false);
+    props.onClose();
+  };
+
+  const handleChange = (event) => {
+    setAssignment({...assignment, [event.target.name]:event.target.value });
+  }
+
+  const addAssignment = ( ) => {
+    fetch(`${SERVER_URL}/assignment`, 
+      {  
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json', }, 
+        body: JSON.stringify(assignment)
+      } 
+    )
+    .then((response) => { 
+      if (response.ok) {
+          setMessage('Assignment added.');
+      } else {
+          setMessage("Add failed.");
+      }
+   } )
+  .catch((err) =>  { setMessage('Error. '+err) } );
+  }
+
   return (
-    <div>
-      <h2>Add Assignment</h2>
       <div>
-        <label htmlFor="assignmentName">Assignment Name:</label>
-        <input
-          type="text"
-          id="assignmentName"
-          value={assignmentName}
-          onChange={(e) => setAssignmentName(e.target.value)}
-          required
-        />
+        <button type="button" margin="auto" onClick={handleOpen}>Add Assignment</button>
+        <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>New Assignment</DialogTitle>
+            <DialogContent  style={{paddingTop: 20}} >
+              <h4>{message}</h4>
+              <TextField autoFocus fullWidth label="Name" name="assignmentName" onChange={handleChange}  /> 
+              <TextField fullWidth label="Due Date" name="dueDate" helperText="yyyy-mm-dd" onChange={handleChange}  /> 
+              <TextField fullWidth label="Course ID" name="courseId" onChange={handleChange}  />
+            </DialogContent>
+            <DialogActions>
+              <Button color="secondary" onClick={handleClose}>Close</Button>
+              <Button id="add" color="primary" onClick={addAssignment}>Add</Button>
+            </DialogActions>
+          </Dialog>      
       </div>
-      <div>
-        <label htmlFor="dueDate">Due Date:</label>
-        <input
-          type="date"
-          id="dueDate"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="courseId">Course ID:</label>
-        <input
-          type="text"
-          id="courseId"
-          value={courseId}
-          onChange={(e) => setCourseId(e.target.value)}
-          required
-        />
-      </div>
-      <button onClick={handleSubmit}>Create Assignment</button>
-      <p>{message}</p>
-      <Link to="/">Back to Assignments</Link>
-    </div>
-  );
+  ); 
 }
 
 export default AddAssignment;

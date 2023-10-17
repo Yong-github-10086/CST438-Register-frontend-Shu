@@ -1,101 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { SERVER_URL } from '../constants';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import {SERVER_URL} from '../constants';
 
-function EditAssignment(props) {
-  const [assignmentName, setAssignmentName] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [courseId, setCourseId] = useState('');
+
+function EditAssignment(props) { 
+
+  const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
-
-  const assignmentId = props.match.params.id;
-
-  useEffect(() => {
-    const fetchAssignmentData = () => {
-      setMessage('');
-      fetch(`${SERVER_URL}/assignment/${assignmentId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          // setAssignment(data);
-          console.log("data.name: " + data.assignmentName);
-          setAssignmentName(data.assignmentName);
-          setDueDate(data.dueDate);
-          setCourseId(data.courseId);
-        })
-        .catch((error) => {
-          setMessage('Error: ' + error);
-          console.error('Error:', error);
-        });
-    };
-    fetchAssignmentData(); 
-  }, [assignmentId]);
-
- 
-
-  const handleUpdate = () => {
+  const [assignment, setAssignment] = useState(props.assignment)
+  
+  const handleOpen = () => {
     setMessage('');
-    const updatedAssignmentData = {
-      id: assignmentId,
-      assignmentName: assignmentName,
-      dueDate: dueDate,
-      courseId: courseId,
-    };
-
-    fetch(`${SERVER_URL}/assignment/${assignmentId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedAssignmentData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          setMessage('Assignment updated successfully.');
-          
-        } else {
-          setMessage('Failed to update assignment.');
-          console.error('Failed to update assignment.');
-        }
-      })
-      .catch((error) => {
-        setMessage('Error: ' + error);
-        console.error('Error:', error);
-      });
+    setOpen(true);
   };
 
-  return (
-    <div>
-      <h2>Edit Assignment</h2>
-      <div>
-        <label htmlFor="assignmentName">Assignment Name:</label>
-        <input
-          type="text"
-          id="assignmentName"
-          value={assignmentName}
-          onChange={(e) => setAssignmentName(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="dueDate">Due Date:</label>
-        <input
-          type="date"
-          id="dueDate"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="courseId">Course ID:</label>
-        <span id="courseId">{courseId}</span>
+  const handleClose = () => {
+    setOpen(false);
+    props.onClose();
+  };
 
+  const handleChange = (event) => {
+    setAssignment({...assignment, [event.target.name]:event.target.value });
+  }
+
+  const saveAssignment = () => {
+    fetch(`${SERVER_URL}/assignment/${assignment.id}`, 
+    {  
+      method: 'PUT', 
+      headers: { 'Content-Type': 'application/json', }, 
+      body: JSON.stringify(assignment)
+    } 
+  )
+  .then((response) => { 
+    if (response.ok) {
+        setMessage('Assignment saved.');
+    } else {
+        setMessage("Save failed. " + response.status);
+    }
+ } )
+.catch((err) =>  { setMessage('Error. '+err) } );
+  }
+
+  return (
+      <div>
+        <button type="button" margin="auto" onClick={handleOpen}>Edit</button>
+        <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Edit Assignment</DialogTitle>
+            <DialogContent  style={{paddingTop: 20}} >
+              <h4>{message}</h4>
+              <TextField fullWidth label="Id" name="id" value={assignment.id} InputProps={{readOnly: true, }}/>
+              <TextField autoFocus fullWidth label="Name" name="assignmentName" value={assignment.assignmentName} onChange={handleChange}  /> 
+              <TextField fullWidth label="Due Date" name="dueDate" value={assignment.dueDate} onChange={handleChange}  /> 
+            </DialogContent>
+            <DialogActions>
+              <Button color="secondary" onClick={handleClose}>Close</Button>
+              <Button color="primary" onClick={saveAssignment}>Save</Button>
+            </DialogActions>
+          </Dialog>      
       </div>
-      <button onClick={handleUpdate}>Update Assignment</button>
-      <p>{message}</p>
-      <Link to={`/`}>Back to Assignment</Link>
-    </div>
-  );
+  ); 
 }
 
 export default EditAssignment;
