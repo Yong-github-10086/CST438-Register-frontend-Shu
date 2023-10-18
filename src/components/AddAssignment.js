@@ -53,7 +53,7 @@ function AddAssignment(props) {
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>New Assignment</DialogTitle>
             <DialogContent  style={{paddingTop: 20}} >
-              <h4>{message}</h4>
+              <h4 id="msgAdd">{message}</h4>
               <TextField autoFocus fullWidth label="Name" name="assignmentName" onChange={handleChange}  /> 
               <TextField fullWidth label="Due Date" name="dueDate" helperText="yyyy-mm-dd" onChange={handleChange}  /> 
               <TextField fullWidth label="Course ID" name="courseId" onChange={handleChange}  />
