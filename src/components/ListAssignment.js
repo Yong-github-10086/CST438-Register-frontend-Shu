@@ -29,9 +29,9 @@ function ListAssignment(props) {
   useEffect(fetchAssignments, []);
    
   
-  const deleteAssignment = (id) => {
+  const deleteAssignment = (id, force) => {
     console.log("delete assignment "+id);
-    fetch(`${SERVER_URL}/assignment/${id}`, 
+    fetch(`${SERVER_URL}/assignment/${id}?force=${force}`, 
       {  
         method: 'DELETE', 
       } 
