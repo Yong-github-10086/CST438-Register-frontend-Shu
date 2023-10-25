@@ -12,11 +12,14 @@ function ListAssignment(props) {
   const [assignments, setAssignments] = useState([]);
   const [message, setMessage] = useState('');
 
-  
+  const token = sessionStorage.getItem("jwt");
+
  
   const fetchAssignments = () => {
     console.log("fetchAssignments");
-    fetch(`${SERVER_URL}/assignment`)
+    fetch(`${SERVER_URL}/assignment`,{
+      headers: {'Authorization' : token}
+    })
     .then((response) => response.json() ) 
     .then((data) => { 
       console.log("assignment length "+data.length);
@@ -34,6 +37,10 @@ function ListAssignment(props) {
     fetch(`${SERVER_URL}/assignment/${id}?force=${force}`, 
       {  
         method: 'DELETE', 
+        headers: {'Authorization' : token,
+        'Content-Type': 'application/json',
+      }
+
       } 
     )
     .then((response) => { 
