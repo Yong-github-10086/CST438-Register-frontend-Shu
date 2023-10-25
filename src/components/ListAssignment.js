@@ -38,7 +38,6 @@ function ListAssignment(props) {
       {  
         method: 'DELETE', 
         headers: {'Authorization' : token,
-        
       }
 
       } 
