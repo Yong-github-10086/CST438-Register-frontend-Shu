@@ -13,7 +13,8 @@ function EditAssignment(props) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [assignment, setAssignment] = useState(props.assignment)
-  
+  const token = sessionStorage.getItem("jwt");
+
   const handleOpen = () => {
     setMessage('');
     setOpen(true);
@@ -32,7 +33,8 @@ function EditAssignment(props) {
     fetch(`${SERVER_URL}/assignment/${assignment.id}`, 
     {  
       method: 'PUT', 
-      headers: { 'Content-Type': 'application/json', }, 
+      headers: { 'Authorization' : token,
+      'Content-Type': 'application/json', }, 
       body: JSON.stringify(assignment)
     } 
   )
