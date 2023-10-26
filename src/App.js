@@ -27,17 +27,14 @@
 // export default App;
 import './App.css';
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom'; // Import BrowserRouter
 import Login from './components/Login';
 
 function App() {
 
     return (
-      <Router > {/* Wrap your entire app with Router */}
       <div className="App">
         <Login />
       </div>
-    </Router>
     )
 }
 export default App;
