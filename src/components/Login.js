@@ -1,5 +1,9 @@
 import React, {useState} from 'react';
 import ListAssignment from './ListAssignment';
+import { BrowserRouter, Switch,Route } from 'react-router-dom'; // Import BrowserRouter
+import GradeAssignment from './GradeAssignment';
+import AddAssignment from './AddAssignment'; 
+import EditAssignment from './EditAssignment'; 
 
 function Login() {
     const[user, setUser] = useState({username:'', password:''});
@@ -26,7 +30,17 @@ function Login() {
     }
 
     if (isAuthenticated) {
-        return <ListAssignment />;
+        return  <BrowserRouter>
+                 <div>
+                   <Switch>
+                     <Route exact path="/" component={ListAssignment} />
+                     <Route path="/addAssignment" component={AddAssignment} /> 
+                     <Route path="/editAssignment/:id" component={EditAssignment} /> 
+                     <Route path="/gradeAssignment" component={GradeAssignment} />
+                     <Route render={() => <h1>Page not found</h1>} />
+                   </Switch>
+                 </div>
+               </BrowserRouter>
     } else {
         return (
             <div className="App">
